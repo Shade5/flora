@@ -9,7 +9,9 @@ import {
   IDataSourceFactory,
   usePlayerSelection,
 } from "@lichtblick/suite-base/context/PlayerSelectionContext";
-import showOpenFilePicker from "@lichtblick/suite-base/util/showOpenFilePicker";
+import showOpenFilePicker, {
+  showDirectoryPicker,
+} from "@lichtblick/suite-base/util/showOpenFilePicker";
 
 export function useOpenFile(sources: readonly IDataSourceFactory[]): () => Promise<void> {
   const { selectSource } = usePlayerSelection();
@@ -25,39 +27,30 @@ export function useOpenFile(sources: readonly IDataSourceFactory[]): () => Promi
   }, [sources]);
 
   return useCallback(async () => {
-    const [fileHandle] = await showOpenFilePicker({
-      types: [
-        {
-          description: allExtensions.join(", "),
-          accept: { "application/octet-stream": allExtensions },
-        },
-      ],
-    });
-    if (!fileHandle) {
+    // Use directory picker instead of file picker
+    const dirHandle = await showDirectoryPicker();
+    if (!dirHandle) {
       return;
     }
 
-    const file = await fileHandle.getFile();
-    // Find the first _file_ source which can load our extension
-    const matchingSources = sources.filter((source) => {
-      // Only consider _file_ type sources that have a list of supported file types
-      if (!source.supportedFileTypes || source.type !== "file") {
-        return false;
+    // Assume onering.mcap exists in the selected directory
+    try {
+      const fileHandle = await dirHandle.getFileHandle("onering.mcap");
+      const file = await fileHandle.getFile();
+
+      // Find the McapLocalDataSourceFactory to handle this file
+      const mcapSource = sources.find(
+        (source) => source.id === "mcap-local-file" && source.supportedFileTypes?.includes(".mcap"),
+      );
+
+      if (!mcapSource) {
+        throw new Error("Cannot find MCAP data source to handle the file");
       }
 
-      const extension = path.extname(file.name);
-      return source.supportedFileTypes.includes(extension);
-    });
-
-    if (matchingSources.length > 1) {
-      throw new Error(`Multiple source matched ${file.name}. This is not supported.`);
+      selectSource(mcapSource.id, { type: "file", handle: fileHandle });
+    } catch (error) {
+      console.error("Error accessing onering.mcap in the selected directory:", error);
+      throw new Error("Could not find onering.mcap in the selected directory");
     }
-
-    const foundSource = matchingSources[0];
-    if (!foundSource) {
-      throw new Error(`Cannot find source to handle ${file.name}`);
-    }
-
-    selectSource(foundSource.id, { type: "file", handle: fileHandle });
-  }, [allExtensions, selectSource, sources]);
+  }, [selectSource, sources]);
 }

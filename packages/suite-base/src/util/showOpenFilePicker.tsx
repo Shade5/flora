@@ -18,3 +18,22 @@ export default async function showOpenFilePicker(
     throw err;
   }
 }
+
+/**
+ * A wrapper around window.showDirectoryPicker that returns undefined instead of throwing when
+ * the user cancels the directory picker.
+ */
+export async function showDirectoryPicker(
+  options?: DirectoryPickerOptions,
+): Promise<
+  FileSystemDirectoryHandle | undefined /* foxglove-depcheck-used: @types/wicg-file-system-access */
+> {
+  try {
+    return await window.showDirectoryPicker(options);
+  } catch (err) {
+    if (err.name === "AbortError") {
+      return undefined;
+    }
+    throw err;
+  }
+}
