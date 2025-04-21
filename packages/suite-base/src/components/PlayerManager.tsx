@@ -20,6 +20,7 @@ import {
   useLayoutEffect,
   useMemo,
   useState,
+  useRef,
 } from "react";
 import { useLatest, useMountedState } from "react-use";
 
@@ -55,6 +56,7 @@ import {
 import UserScriptPlayer from "@lichtblick/suite-base/players/UserScriptPlayer";
 import { Player } from "@lichtblick/suite-base/players/types";
 import { UserScripts } from "@lichtblick/suite-base/types/panels";
+import { getLastSelectedFolderName } from "@lichtblick/suite-base/context/Workspace/useOpenFile";
 
 const log = Logger.getLogger(__filename);
 
@@ -248,7 +250,7 @@ export default function PlayerManager(props: PropsWithChildren<PlayerManagerProp
               setBasePlayer(newPlayer);
               addRecent({
                 type: "file",
-                title: handle.name,
+                title: getLastSelectedFolderName() ?? handle.name,
                 sourceId: foundSource.id,
                 handle,
               });
