@@ -7,20 +7,11 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   App,
   AppSetting,
-  FoxgloveWebSocketDataSourceFactory,
   IAppConfiguration,
   IDataSourceFactory,
   IdbExtensionLoader,
   McapLocalDataSourceFactory,
   OsContext,
-  RemoteDataSourceFactory,
-  Ros1LocalBagDataSourceFactory,
-  Ros1SocketDataSourceFactory,
-  Ros2LocalBagDataSourceFactory,
-  RosbridgeDataSourceFactory,
-  SampleNuscenesDataSourceFactory,
-  UlogLocalDataSourceFactory,
-  VelodyneDataSourceFactory,
 } from "@lichtblick/suite-base";
 
 import { DesktopExtensionLoader } from "./services/DesktopExtensionLoader";
@@ -80,18 +71,7 @@ export default function Root(props: {
       return props.dataSources;
     }
 
-    const sources = [
-      new FoxgloveWebSocketDataSourceFactory(),
-      new RosbridgeDataSourceFactory(),
-      new Ros1SocketDataSourceFactory(),
-      new Ros1LocalBagDataSourceFactory(),
-      new Ros2LocalBagDataSourceFactory(),
-      new UlogLocalDataSourceFactory(),
-      new VelodyneDataSourceFactory(),
-      new SampleNuscenesDataSourceFactory(),
-      new McapLocalDataSourceFactory(),
-      new RemoteDataSourceFactory(),
-    ];
+    const sources = [new McapLocalDataSourceFactory()];
 
     return sources;
   }, [props.dataSources]);

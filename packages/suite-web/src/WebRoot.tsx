@@ -7,17 +7,10 @@ import { useMemo, useState } from "react";
 import {
   AppBarProps,
   AppSetting,
-  FoxgloveWebSocketDataSourceFactory,
   IDataSourceFactory,
   IdbExtensionLoader,
   McapLocalDataSourceFactory,
-  RemoteDataSourceFactory,
-  Ros1LocalBagDataSourceFactory,
-  Ros2LocalBagDataSourceFactory,
-  RosbridgeDataSourceFactory,
-  SampleNuscenesDataSourceFactory,
   SharedRoot,
-  UlogLocalDataSourceFactory,
 } from "@lichtblick/suite-base";
 
 import LocalStorageAppConfiguration from "./services/LocalStorageAppConfiguration";
@@ -46,16 +39,7 @@ export function WebRoot(props: {
   ]);
 
   const dataSources = useMemo(() => {
-    const sources = [
-      new Ros1LocalBagDataSourceFactory(),
-      new Ros2LocalBagDataSourceFactory(),
-      new FoxgloveWebSocketDataSourceFactory(),
-      new RosbridgeDataSourceFactory(),
-      new UlogLocalDataSourceFactory(),
-      new SampleNuscenesDataSourceFactory(),
-      new McapLocalDataSourceFactory(),
-      new RemoteDataSourceFactory(),
-    ];
+    const sources = [new McapLocalDataSourceFactory()];
 
     return props.dataSources ?? sources;
   }, [props.dataSources]);
