@@ -282,6 +282,8 @@ export type PanelExtensionContext = {
    */
   readonly dataSourceProfile?: string;
 
+  readonly logDir?: string;
+
   /**
    * An array of metadata entries. Each entry includes a name and a map of key-value pairs
    * representing the metadata associated with that name (only avaiable in MCAP files).

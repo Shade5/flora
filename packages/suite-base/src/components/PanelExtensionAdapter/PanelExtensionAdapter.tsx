@@ -36,6 +36,7 @@ import {
   getExtensionPanelSettings,
   useExtensionCatalog,
 } from "@lichtblick/suite-base/context/ExtensionCatalogContext";
+import { getLastSelectedFolderName } from "@lichtblick/suite-base/context/Workspace/useOpenFile";
 import {
   useClearHoverValue,
   useHoverValue,
@@ -334,8 +335,11 @@ function PanelExtensionAdapter(
       );
     };
 
+    const lastSelectedFolderName = getLastSelectedFolderName();
+
     return {
       initialState: initialState.current,
+      logDir: lastSelectedFolderName,
 
       saveState: (state) => {
         if (!isMounted()) {
