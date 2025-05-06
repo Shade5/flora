@@ -134,7 +134,7 @@ export class IterablePlayer implements Player {
   #providerTopicStats = new Map<string, TopicStats>();
   #providerDatatypes: RosDatatypes = new Map();
 
-  #capabilities: string[] = [PlayerCapabilities.setSpeed, PlayerCapabilities.playbackControl];
+  #capabilities: string[] = [PlayerCapabilities.setSpeed, PlayerCapabilities.playbackControl, PlayerCapabilities.advertise];
   #profile: string | undefined;
   #metricsCollector: PlayerMetricsCollectorInterface;
   #subscriptions: SubscribePayload[] = [];
@@ -178,6 +178,9 @@ export class IterablePlayer implements Player {
   #metadata: readonly Metadata[] = Object.freeze([]);
 
   #untilTime?: Time;
+
+  // Map of topic to schemaName for published internal topics
+  #publisherSchema = new Map<string, string>();
 
   /** Promise that resolves when the player is closed. Only used for testing currently */
   public readonly isClosed: Promise<void>;
@@ -344,16 +347,52 @@ export class IterablePlayer implements Player {
     }
   }
 
-  public setPublishers(_publishers: AdvertiseOptions[]): void {
-    // no-op
+  public setPublishers(publishers: AdvertiseOptions[]): void {
+    // Clear previous registrations and record new topics/schemas
+    this.#publisherSchema.clear();
+    this.#publishedTopics.clear();
+    for (const { topic, schemaName } of publishers) {
+      if (schemaName) {
+        this.#publisherSchema.set(topic, schemaName);
+      }
+      let s = this.#publishedTopics.get(topic);
+      if (!s) {
+        s = new Set<string>();
+        this.#publishedTopics.set(topic, s);
+      }
+      s.add(this.#id);
+      // Expose this topic in the UI pipeline if new
+      if (!this.#providerTopics.some((t) => t.name === topic)) {
+        this.#providerTopics = [...this.#providerTopics, { name: topic, schemaName }];
+      }
+      // Initialize stats if needed
+      if (!this.#providerTopicStats.has(topic)) {
+        this.#providerTopicStats.set(topic, { numMessages: 0 });
+      }
+    }
+    this.#queueEmitState();
   }
 
   public setParameter(_key: string, _value: ParameterValue): void {
     throw new Error("Parameter editing is not supported by this data source");
   }
 
-  public publish(_payload: PublishPayload): void {
-    throw new Error("Publishing is not supported by this data source");
+  public publish({ topic, msg }: PublishPayload): void {
+    // Emit message into the internal pipeline with full MessageEvent
+    const receiveTime: Time = this.#currentTime ?? { sec: 0, nsec: 0 };
+    const schemaName = this.#publisherSchema.get(topic) ?? "";
+    // JSON.stringify can return undefined, so default to empty string
+    const jsonStr = JSON.stringify(msg) ?? "";
+    const sizeInBytes = jsonStr.length;
+    const event: MessageEvent = {
+      topic,
+      schemaName,
+      receiveTime,
+      message: msg,
+      sizeInBytes,
+    };
+    this.#messages = [...this.#messages, event];
+    this.#queueEmitState();
   }
 
   public async callService(): Promise<unknown> {
