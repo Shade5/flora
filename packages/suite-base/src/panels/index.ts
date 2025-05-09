@@ -197,4 +197,11 @@ export const getBuiltin: (t: TFunction<"panels">) => PanelInfo[] = (t) => [
     thumbnail: videoPlayerClientThumbnail,
     module: async () => await import("./VideoPlayerClient"),
   },
+  {
+    title: "labelUnsafeEvents",
+    type: "LabelUnsafeEvents",
+    description: "Used for labeling unsafe events in a log.",
+    thumbnail: dataSourceInfoThumbnail,
+    module: async () => await import("./LabelUnsafeEvents"),
+  },
 ];
