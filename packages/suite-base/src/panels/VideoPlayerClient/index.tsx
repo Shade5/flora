@@ -284,7 +284,7 @@ function VideoPlayerPanelInner(): ReactElement {
 }
 
 // Wrapper component provided to the Panel HOC
-const VideoPlayerPanel = ({ config, saveConfig }: { config: PanelConfig; saveConfig: SaveConfig<PanelConfig> }) => {
+const VideoPlayerPanel = ({ config: _config, saveConfig: _saveConfig }: { config: PanelConfig; saveConfig: SaveConfig<PanelConfig> }) => {
     // Pass config/saveConfig down if needed in the future, e.g., for settings
     return <VideoPlayerPanelInner />;
 };
