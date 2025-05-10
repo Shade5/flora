@@ -97,7 +97,7 @@ export class ServerLayoutLoader implements LayoutLoader {
 
       const layoutResults = await Promise.all(layoutPromises);
       const validLayouts = layoutResults.filter(Boolean) as LayoutInfo[];
-
+      console.log(`Loaded ${validLayouts.length} layouts from server`);
       log.debug(`Loaded ${validLayouts.length} layouts from server`);
       return validLayouts;
     } catch (error) {

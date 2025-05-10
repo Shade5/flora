@@ -22,8 +22,8 @@ import {
 } from "@lichtblick/suite-base";
 
 import LocalStorageAppConfiguration from "./services/LocalStorageAppConfiguration";
-// Configure the URL where server-hosted extensions are located
-const SERVER_EXTENSIONS_URL = "http://f:8000/flora/";
+// Configure the URL where server-hosted extensions are located (default to empty string if unset)
+const SERVER_EXTENSIONS_URL = process.env.SERVER_EXTENSIONS_URL ?? "";
 
 const isDevelopment = process.env.NODE_ENV === "development";
 
