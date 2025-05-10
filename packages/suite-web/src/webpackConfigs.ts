@@ -16,6 +16,7 @@ import type {
 import type { WebpackArgv } from "@lichtblick/suite-base/WebpackArgv";
 import { makeConfig } from "@lichtblick/suite-base/webpack";
 import * as palette from "@lichtblick/theme/src/palette";
+import webpack from "webpack";
 
 export interface WebpackConfiguration extends Configuration {
   devServer?: WebpackDevServerConfiguration;
@@ -103,50 +104,51 @@ export const devServerConfig = (params: ConfigParams): WebpackConfiguration => (
 
 export const mainConfig =
   (params: ConfigParams) =>
-  (env: unknown, argv: WebpackArgv): Configuration => {
-    const isDev = argv.mode === "development";
-    const isServe = argv.env?.WEBPACK_SERVE ?? false;
+    (env: unknown, argv: WebpackArgv): Configuration => {
+      const isDev = argv.mode === "development";
+      const isServe = argv.env?.WEBPACK_SERVE ?? false;
 
-    const allowUnusedVariables = isDev;
+      const allowUnusedVariables = isDev;
 
-    const plugins: WebpackPluginInstance[] = [];
+      const plugins: WebpackPluginInstance[] = [];
 
-    if (isServe) {
-      plugins.push(new ReactRefreshPlugin());
-    }
+      if (isServe) {
+        plugins.push(new ReactRefreshPlugin());
+      }
 
-    const appWebpackConfig = makeConfig(env, argv, {
-      allowUnusedVariables,
-      version: params.version,
-    });
+      const appWebpackConfig = makeConfig(env, argv, {
+        allowUnusedVariables,
+        version: params.version,
+      });
 
-    const config: Configuration = {
-      name: "main",
+      const config: Configuration = {
+        name: "main",
 
-      ...appWebpackConfig,
+        ...appWebpackConfig,
 
-      target: "web",
-      context: params.contextPath,
-      entry: params.entrypoint,
-      devtool: isDev ? "eval-cheap-module-source-map" : params.prodSourceMap,
+        target: "web",
+        context: params.contextPath,
+        entry: params.entrypoint,
+        devtool: isDev ? "eval-cheap-module-source-map" : params.prodSourceMap,
 
-      output: {
-        publicPath: params.publicPath ?? "auto",
+        output: {
+          publicPath: params.publicPath ?? "auto",
 
-        // Output filenames should include content hashes in order to cache bust when new versions are available
-        filename: isDev ? "[name].js" : "[name].[contenthash].js",
+          // Output filenames should include content hashes in order to cache bust when new versions are available
+          filename: isDev ? "[name].js" : "[name].[contenthash].js",
 
-        path: params.outputPath,
-      },
+          path: params.outputPath,
+        },
 
-      plugins: [
-        ...plugins,
-        ...(appWebpackConfig.plugins ?? []),
-        new CopyPlugin({
-          patterns: [{ from: path.resolve(__dirname, "..", "public") }],
-        }),
-        new HtmlWebpackPlugin({
-          templateContent: ({ htmlWebpackPlugin }) => `
+        plugins: [
+          new webpack.EnvironmentPlugin({ SERVER_EXTENSIONS_URL: "" }),
+          ...plugins,
+          ...(appWebpackConfig.plugins ?? []),
+          new CopyPlugin({
+            patterns: [{ from: path.resolve(__dirname, "..", "public") }],
+          }),
+          new HtmlWebpackPlugin({
+            templateContent: ({ htmlWebpackPlugin }) => `
   <!doctype html>
   <html>
     <head>
@@ -271,16 +273,16 @@ export const mainConfig =
     </body>
   </html>
   `,
-          foxgloveExtraHeadTags: `
+            foxgloveExtraHeadTags: `
             <title>Flora</title>
             <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png" />
             <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png" />
             <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png" />
           `,
-          ...params.indexHtmlOptions,
-        }),
-      ],
-    };
+            ...params.indexHtmlOptions,
+          }),
+        ],
+      };
 
-    return config;
-  };
+      return config;
+    };
