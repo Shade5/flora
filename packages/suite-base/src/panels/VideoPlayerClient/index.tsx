@@ -7,7 +7,6 @@ import {
     MessagePipelineContext,
     useMessagePipeline,
 } from "../../components/MessagePipeline";
-import { PanelConfig, SaveConfig } from "@lichtblick/suite-base/types/panels";
 import { windowAppURLState } from "@lichtblick/suite-base/util/appURLState";
 
 // Define the Time interface locally
@@ -283,16 +282,9 @@ function VideoPlayerPanelInner(): ReactElement {
     );
 }
 
-// Wrapper component provided to the Panel HOC
-const VideoPlayerPanel = ({ config, saveConfig }: { config: PanelConfig; saveConfig: SaveConfig<PanelConfig> }) => {
-    // Pass config/saveConfig down if needed in the future, e.g., for settings
-    return <VideoPlayerPanelInner />;
-};
-
-// Panel metadata
-VideoPlayerPanel.panelType = "VideoPlayerClient";
-// Define default config - could hold base path or other settings later
-VideoPlayerPanel.defaultConfig = {};
+// Attach panel metadata directly to the inner component
+VideoPlayerPanelInner.panelType = "VideoPlayerClient";
+VideoPlayerPanelInner.defaultConfig = {};
 
 // Export the panel component wrapped in the Panel HOC
-export default Panel(VideoPlayerPanel);
+export default Panel(VideoPlayerPanelInner);
