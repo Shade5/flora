@@ -141,7 +141,7 @@ export const mainConfig =
         },
 
         plugins: [
-          new webpack.EnvironmentPlugin({ SERVER_EXTENSIONS_URL: "" }),
+          new webpack.EnvironmentPlugin({NAS_FLORA_URL: "" }),
           ...plugins,
           ...(appWebpackConfig.plugins ?? []),
           new CopyPlugin({

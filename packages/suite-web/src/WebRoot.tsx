@@ -23,7 +23,9 @@ import {
 
 import LocalStorageAppConfiguration from "./services/LocalStorageAppConfiguration";
 // Configure the URL where server-hosted extensions are located (default to empty string if unset)
-const SERVER_EXTENSIONS_URL = process.env.SERVER_EXTENSIONS_URL ?? "";
+// append /flora/ to the url
+const SERVER_EXTENSIONS_URL = `${process.env.NAS_FLORA_URL ?? "" }/flora/`;
+
 
 const isDevelopment = process.env.NODE_ENV === "development";
 
