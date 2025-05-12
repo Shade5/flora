@@ -44,11 +44,13 @@ function VideoPlayerPanelInner(): ReactElement {
     // Derive log_name and media paths from the dsUrl
     // Update this regex if your URL pattern is different
     const log_name = dsUrl?.match(/ailog_([A-Z0-9-]+)_(\d{4}_\d{2}_\d{2}-\d{2}_\d{2}_\d{2})/)?.[0] ?? "";
-    // Consider making this base path configurable in panel settings later
-    const basePath = `http://comino1:8000/ai_logs/${log_name}`;
-    const videoUrl = `${basePath}/video_preview.mp4`;
-    const audioUrl = `${basePath}/video.robot.ogg`;
-    const timestampUrl = `${basePath}/video.timestamp`;
+    const basePath = `${process.env.NAS_FLORA_URL ?? ""}/ai_logs/`;
+    const videoUrl = `${basePath}/${log_name}/video_preview.mp4`;
+    const audioUrl = `${basePath}/${log_name}/video.robot.ogg`;
+    const timestampUrl = `${basePath}/${log_name}/video.timestamp`;
+    console.log("videoUrl", videoUrl);
+    console.log("audioUrl", audioUrl);
+    console.log("timestampUrl", timestampUrl);
 
     // Effect to fetch video timestamp when the source changes
     useEffect(() => {
