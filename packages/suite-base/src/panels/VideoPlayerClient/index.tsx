@@ -48,9 +48,6 @@ function VideoPlayerPanelInner(): ReactElement {
     const videoUrl = `${basePath}/${log_name}/video_preview.mp4`;
     const audioUrl = `${basePath}/${log_name}/video.robot.ogg`;
     const timestampUrl = `${basePath}/${log_name}/video.timestamp`;
-    console.log("videoUrl", videoUrl);
-    console.log("audioUrl", audioUrl);
-    console.log("timestampUrl", timestampUrl);
 
     // Effect to fetch video timestamp when the source changes
     useEffect(() => {
